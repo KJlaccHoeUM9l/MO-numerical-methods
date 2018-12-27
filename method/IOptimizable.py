@@ -33,14 +33,11 @@ class optimizable(ABC):
 
         self.expression = Parser().parse(self.targetExpression)
 
-
     def printExpression(self):
         print('Q(x,y) = ' + self.targetExpression)
 
-
     def Q(self, x, y):
         return self.expression.evaluate({'x': x, 'y': y})
-
 
     def initPlot(self, plotName, X, Y):
         x, y = np.meshgrid(X, Y)
@@ -59,11 +56,9 @@ class optimizable(ABC):
 
         return plt
 
-
     def showFunction3D(self):
         x, y = symbols('x y')
         plot3d(self.targetExpression, (x, self.a, self.b), (y, self.c, self.d))
-
 
     def showFunction2D(self):
         density = 50
@@ -81,7 +76,6 @@ class optimizable(ABC):
         newPlot.plot(self.x_.x, self.x_.y, self.Q_, 'rs', label='optimum')
         newPlot.show()
 
-
     def showReference(self):
         print('->Input:')
         print('--->Q(x,y) = ' + self.targetExpression)
@@ -93,7 +87,6 @@ class optimizable(ABC):
         print('--->Iterations: ', self.N)
         print('--->x* = (%3.f, %3.f)' % (self.x_.x, self.x_.y))
         print('--->Q(x*) = %3.f' % self.Q_)
-
 
     @abstractmethod
     def numericalSolution(self):

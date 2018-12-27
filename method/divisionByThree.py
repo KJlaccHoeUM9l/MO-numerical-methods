@@ -1,5 +1,7 @@
 from method.IOptimizable import optimizable
 import math
+from helpers.TPoint import point
+from helpers.TRectangle import rectangle
 
 
 class divisionByThree(optimizable):
@@ -37,7 +39,7 @@ class divisionByThree(optimizable):
         self.x_ = x_min
         self.N = i
 
-
+    # Helper functions
     def iterationOfSearch(self, K):
         Kt = self.K[0]
         Q_eval = self.K[0].__getitem__(2)
@@ -53,8 +55,6 @@ class divisionByThree(optimizable):
                 x_min = Ki.__getitem__(0).center
 
         return Kt, Q_eval, Q_min, x_min
-
-
 
     def getThreeRectangles(self, P):
         if (P.width >= P.height):
@@ -91,39 +91,3 @@ class divisionByThree(optimizable):
         Q_ = Q - self.L * (P.getDiam() / 2.0)
 
         return (P, Q, Q_)
-
-
-# Helper classes
-class point:
-    x = 0.0
-    y = 0.0
-
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def __str__(self) -> str:
-        return '(' + str(self.x) + ', ' + str(self.y) + ')'
-
-
-class rectangle:
-    width = 0.0
-    height = 0.0
-    leftUp = point(0.0, 0.0)
-    rightDown = point(0.0, 0.0)
-    center = point(0.0, 0.0)
-
-    def __init__(self, leftUp, rightDown):
-        self.leftUp = leftUp
-        self.rightDown = rightDown
-        self.width = self.rightDown.x - self.leftUp.x
-        self.height = self.leftUp.y - self.rightDown.y
-        self.center = point((self.leftUp.x + self.rightDown.x) / 2.0,
-                            (self.leftUp.y + self.rightDown.y) / 2.0)
-
-
-    def getDiam(self):
-        return math.sqrt(self.width**2 + self.height**2)
-
-    def __str__(self) -> str:
-        return 'Rectangle'
