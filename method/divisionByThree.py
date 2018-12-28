@@ -2,16 +2,24 @@ from method.IOptimizable import optimizable
 import math
 from helpers.TPoint import point
 from helpers.TRectangle import rectangle
+from method.IAnimated import IAnimated
 
 
-class divisionByThree(optimizable):
+class divisionByThree(optimizable, IAnimated):
     K = []
-    L = 0.5
+    L = 2#0.5
 
     # Override
     def numericalSolution(self):
         P = rectangle(point(self.a, self.d), point(self.b, self.c))
         Px, Py, Pz = self.getThreeRectangles(P)
+
+        # For animation
+        #self.rectangles.append(P);
+        self.rectangles.append(Px)
+        self.rectangles.append(Py)
+        self.rectangles.append(Pz)
+
 
         self.K.append(self.getTuple(Px))
         self.K.append(self.getTuple(Py))
@@ -22,15 +30,21 @@ class divisionByThree(optimizable):
         self.K.remove(Kt)
 
         i = 0
-        while (abs(Q_min - Q_eval) > self.eps and i < 100):
+        while (abs(Q_min - Q_eval) > self.eps and i < 1000):
             Pt = Kt.__getitem__(0)
             Px, Py, Pz = self.getThreeRectangles(Pt)
 
+            # For animation
+            self.rectangles.append(Px); self.rectangles.append(Py); self.rectangles.append(Pz)
+
             self.K.append(self.getTuple(Px))
-            self.K.append((Py, Kt.__getitem__(1), Kt.__getitem__(1) - self.L * (Py.getDiam() / 2.0)))
+            self.K.append(self.getTuple(Py))
+            #self.K.append((Py, Kt.__getitem__(1), Kt.__getitem__(1) - self.L * (Py.getDiam() / 2.0)))
             self.K.append(self.getTuple(Pz))
 
             Kt, Q_eval, Q_min, x_min = self.iterationOfSearch(self.K)
+
+            self.K.remove(Kt)
 
             i += 1
 
@@ -46,7 +60,7 @@ class divisionByThree(optimizable):
         Q_min = self.K[0].__getitem__(1)
         x_min = self.K[0].__getitem__(0).center
 
-        for Ki in self.K:
+        for Ki in K:
             if Ki.__getitem__(2) < Q_eval:
                 Kt = Ki
                 Q_eval = Ki.__getitem__(2)

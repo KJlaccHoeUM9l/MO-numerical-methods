@@ -18,9 +18,10 @@ if __name__ == '__main__':
     method.printExpression()
     method.numericalSolution()
     method.showReference()
-    method.showMin2D()
+    #method.showMin2D()
     #method.showFunction3D()
     #method.showFunction2D()
+    method.animation2D()
 
 
 
