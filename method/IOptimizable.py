@@ -4,34 +4,29 @@ from py_expression_eval import Parser
 from abc import ABC, ABCMeta, abstractmethod
 from sympy.plotting import plot3d
 from sympy import *
+import matplotlib.patches as patches
+
+from helpers.TPoint import point
 
 class optimizable(ABC):
     __metaclass__ = ABCMeta
 
-    # Input data
     targetExpression = 'x^2+y^2'
     a = -2
     b = 2
     c = -1
     d = 1
-    eps = 0.1
-    maxN = 0
 
-    # Output data
-    N = 0
-    x_ = 0
-    Q_ = 0
-
-    def __init__(self, targetFunction, a, b, c, d, eps, maxN):
+    def __init__(self, targetFunction, a, b, c, d):
         self.targetExpression = targetFunction
         self.a = a
         self.b = b
         self.c = c
         self.d = d
-        self.eps = eps
-        self.maxN = maxN
 
+        self.density = 50
         self.expression = Parser().parse(self.targetExpression)
+        self.rectangles = []  # For animation
 
     def printExpression(self):
         print('Q(x,y) = ' + self.targetExpression)
@@ -41,13 +36,7 @@ class optimizable(ABC):
 
     def initPlot(self, plotName, X, Y):
         x, y = np.meshgrid(X, Y)
-        z = []
-        for i in X:
-            tmp = []
-            for j in Y:
-                tmp.append(self.Q(i, j))
-            z.append(tmp)
-        z = np.array(z)
+        z = self.getFunctionValues(X, Y)
 
         # Create plot
         plt.figure(plotName)
@@ -61,32 +50,59 @@ class optimizable(ABC):
         plot3d(self.targetExpression, (x, self.a, self.b), (y, self.c, self.d))
 
     def showFunction2D(self):
-        density = 50
-        X = np.linspace(self.a, self.b, density)
-        Y = np.linspace(self.c, self.d, density)
+        X = np.linspace(self.a, self.b, self.density)
+        Y = np.linspace(self.c, self.d, self.density)
 
         self.initPlot(self.targetExpression, X, Y).show(self.targetExpression)
 
     def showMin2D(self):
-        density = 50
-        X = np.linspace(self.a, self.b, density)
-        Y = np.linspace(self.c, self.d, density)
+        X = np.linspace(self.a, self.b, self.density)
+        Y = np.linspace(self.c, self.d, self.density)
 
-        newPlot = self.initPlot('Min valuu', X, Y)
+        newPlot = self.initPlot('Min value', X, Y)
         newPlot.plot(self.x_.x, self.x_.y, self.Q_, 'rs', label='optimum')
         newPlot.show()
 
-    def showReference(self):
-        print('->Input:')
-        print('--->Q(x,y) = ' + self.targetExpression)
-        print('--->[a, b] = [', self.a, ',', self.b, ']')
-        print('--->[c, d] = [', self.c, ',', self.d, ']')
-        print('--->eps = ', self.eps)
+    def animation2D(self):
+        tmp, axes = plt.subplots()
+        plt.xlim(self.a, self.b)
+        plt.ylim(self.c, self.d)
 
-        print('->Output:')
-        print('--->Iterations: ', self.N)
-        print('--->x* = (%3.f, %3.f)' % (self.x_.x, self.x_.y))
-        print('--->Q(x*) = %3.f' % self.Q_)
+        X = np.linspace(self.a, self.b, self.density)
+        Y = np.linspace(self.c, self.d, self.density)
+        x, y = np.meshgrid(X, Y)
+        z = self.getFunctionValues(X, Y)
+        axes.contourf(x, y, z, 15)
+
+        plt.ion()
+        iteration = 0
+        for rect in self.rectangles:
+            leftUp = rect.leftUp
+            rightDown = rect.rightDown
+            leftDown = point(leftUp.x, rightDown.y)
+            width = rect.width
+            height = rect.height
+
+            axes.add_patch(
+                patches.Rectangle((leftDown.x, leftDown.y), width, height, color='r', linewidth=1, fill=0))
+
+            plt.draw()
+            plt.pause(0.01)
+
+            iteration += 1
+            if iteration == 200:
+                break
+        plt.ioff()
+
+    def getFunctionValues(self, X, Y):
+        z = []
+        for i in X:
+            tmp = []
+            for j in Y:
+                tmp.append(self.Q(i, j))
+            z.append(tmp)
+
+        return np.array(z).transpose()
 
     @abstractmethod
     def numericalSolution(self):

@@ -1,49 +1,53 @@
 from method.IOptimizable import optimizable
-import math
 from helpers.TPoint import point
 from helpers.TRectangle import rectangle
-from method.IAnimated import IAnimated
 
 
-class divisionByThree(optimizable, IAnimated):
-    K = []
-    L = 2#0.5
+class divisionByThree(optimizable):
+    # Input data
+    eps = 0.1
+    maxN = 100
+    L = 0.2
+
+    # Output data
+    N = 0
+    x_ = 0
+    Q_ = 0
+
+    def __init__(self, targetFunction, a, b, c, d, eps, maxN, L):
+        super().__init__(targetFunction, a, b, c, d)
+        self.eps = eps
+        self.maxN = maxN
+        self.L = L
+
+        self.K = []
 
     # Override
     def numericalSolution(self):
         P = rectangle(point(self.a, self.d), point(self.b, self.c))
         Px, Py, Pz = self.getThreeRectangles(P)
 
-        # For animation
-        #self.rectangles.append(P);
-        self.rectangles.append(Px)
-        self.rectangles.append(Py)
-        self.rectangles.append(Pz)
-
+        self.rectangles.append(Px); self.rectangles.append(Py); self.rectangles.append(Pz)  # For animation
 
         self.K.append(self.getTuple(Px))
         self.K.append(self.getTuple(Py))
         self.K.append(self.getTuple(Pz))
 
         Kt, Q_eval, Q_min, x_min = self.iterationOfSearch(self.K)
-
         self.K.remove(Kt)
 
         i = 0
-        while (abs(Q_min - Q_eval) > self.eps and i < 1000):
+        while (abs(Q_min - Q_eval) > self.eps and i < self.maxN):
             Pt = Kt.__getitem__(0)
             Px, Py, Pz = self.getThreeRectangles(Pt)
 
-            # For animation
-            self.rectangles.append(Px); self.rectangles.append(Py); self.rectangles.append(Pz)
+            self.rectangles.append(Px); self.rectangles.append(Py); self.rectangles.append(Pz)  # For animation
 
             self.K.append(self.getTuple(Px))
-            self.K.append(self.getTuple(Py))
-            #self.K.append((Py, Kt.__getitem__(1), Kt.__getitem__(1) - self.L * (Py.getDiam() / 2.0)))
+            self.K.append((Py, Kt.__getitem__(1), Kt.__getitem__(1) - self.L * (Py.getDiam() / 2.0)))
             self.K.append(self.getTuple(Pz))
 
             Kt, Q_eval, Q_min, x_min = self.iterationOfSearch(self.K)
-
             self.K.remove(Kt)
 
             i += 1
@@ -105,3 +109,17 @@ class divisionByThree(optimizable, IAnimated):
         Q_ = Q - self.L * (P.getDiam() / 2.0)
 
         return (P, Q, Q_)
+
+    def showReference(self):
+        print('->Input:')
+        print('--->Q(x,y) = ' + self.targetExpression)
+        print('--->[a, b] = [', self.a, ',', self.b, ']')
+        print('--->[c, d] = [', self.c, ',', self.d, ']')
+        print('--->eps = ', self.eps)
+        print('--->L = ', self.L)
+
+        print('->Output:')
+        print('--->Iterations: ', self.N)
+        print('--->x* = (%3.f, %3.f)' % (self.x_.x, self.x_.y))
+        print('--->Q(x*) = %3.f' % self.Q_)
+

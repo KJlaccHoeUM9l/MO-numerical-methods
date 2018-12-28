@@ -5,23 +5,25 @@ import numpy as np
 
 
 if __name__ == '__main__':
-    targetFunction = 'x^2+y^2'
+    targetFunction = '(x-1)^2+y^2'
     #targetFunction = '3*(x^2+y)^2+(x^2-1)^2'
     a = -2
     b = 2
     c = -1
     d = 1
     eps = 0.001
-    maxN = 100
-    method = divisionByThree(targetFunction, a, b, c, d, eps, maxN)
+    maxN = 1000
+    L = 0.2
+    method = divisionByThree(targetFunction, a, b, c, d, eps, maxN, L)
 
     method.printExpression()
     method.numericalSolution()
     method.showReference()
     #method.showMin2D()
     #method.showFunction3D()
-    #method.showFunction2D()
     method.animation2D()
+    #method.showFunction2D()
+
 
 
 
