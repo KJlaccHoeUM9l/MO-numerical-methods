@@ -60,7 +60,7 @@ class optimizable(ABC):
         Y = np.linspace(self.c, self.d, self.density)
 
         newPlot = self.initPlot('Min value', X, Y)
-        newPlot.plot(self.x_.x, self.x_.y, self.Q_, 'rs', label='optimum')
+        newPlot.plot(self.x_.x, self.x_.y, 'rs', label='optimum')
         newPlot.show()
 
     def animation2D(self):

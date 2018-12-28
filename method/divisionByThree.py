@@ -122,4 +122,3 @@ class divisionByThree(optimizable):
         print('--->Iterations: ', self.N)
         print('--->x* = (%3.f, %3.f)' % (self.x_.x, self.x_.y))
         print('--->Q(x*) = %3.f' % self.Q_)
-
